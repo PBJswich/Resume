@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #pdf-container {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+            height: 900px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+        }
+        canvas {
+            display: block;
+            margin: 10px auto;
+        }
+        #download-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Resume</h1>
+    <div id="pdf-container"></div>
+    <a id="download-link" href="resume.pdf" download>Download Resume</a>
+
+    <script>
+        const pdfURL = 'resume.pdf';
+
+        function renderPDF(url) {
+            pdfjsLib.getDocument(url).promise.then(pdf => {
+                const container = document.getElementById('pdf-container');
+                container.innerHTML = '';
+
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    pdf.getPage(pageNum).then(page => {
+                        const canvas = document.createElement('canvas');
+                        container.appendChild(canvas);
+
+                        const context = canvas.getContext('2d');
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+                        page.render(renderContext);
+                    });
+                }
+            });
+        }
+
+        renderPDF(pdfURL);
+    </script>
+</body>
+</html>
